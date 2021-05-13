@@ -2,10 +2,28 @@ import styled from 'styled-components/macro';
 import { useState } from 'react';
 
 export default function App() {
-  const [packingListItems, updatePackingListItems] = useState([]);
-  // Variable, Methode zum Aktualisieren der Variable
+  /*
+  _____________________
+  VARIABLEN
+  _____________________
+  */
+
+  const [packingList, updatePackingList] = useState([]);
+  const [packingListOpen, updatePackingListOpen] = useState([]);
+  // 1. Variable, 2. Methode zum Aktualisieren der Variable
   // leeres Array am Anfang
-  console.log(packingListItems);
+  console.log(packingList);
+  console.log(packingListOpen);
+
+  const [openOnly, changeViewToOpenOnly] = useState(false);
+  // Klick auf Buttons verändert Zustand der Seite auf openOnly und zurück
+  // Startwert: false, also nicht openOnly
+
+  /*
+  _____________________
+  RETURN >>> das erscheint in der App
+  _____________________
+  */
 
   return (
     <main>
@@ -21,9 +39,20 @@ export default function App() {
         <input type="text" name="eingabefeld" />
         <button>zur Liste hinzufügen</button>
       </form>
-      <ul>{showPackingListOnScreen(packingListItems)}</ul>
+      <button onClick={showAllItems}>alle Gegenstände anzeigen</button>
+      <button onClick={showOnlyOpenItems}>
+        nur fehlende Gegenstände anzeigen
+      </button>
+      <ul>{packingListOnScreen(packingList, packingListOpen)}</ul>
+      {/*  <ul>{onlyOpenItemsOnScreen(packingListOpen)}</ul> */}
     </main>
   );
+
+  /*
+  _____________________
+  FUNKTIONEN
+  _____________________
+  */
 
   function addNewItemToPackingList(event) {
     event.preventDefault(); // automatisches Neuladen der Seite verhindern
@@ -33,16 +62,37 @@ export default function App() {
       name: inputField.value,
       isPacked: false
     };
-    updatePackingListItems([newItem, ...packingListItems]); // neues item auf die Liste setzen
+    updatePackingList([newItem, ...packingList]);
+    updatePackingListOpen([newItem, ...packingListOpen]);
+    // neues item auf die Listen setzen
 
     myForm.reset(); // Eingabezeile leeren
     inputField.focus(); // Cursor landet automatisch in Eingabezeile
   }
 
-  function showPackingListOnScreen(itemsList) {
-    // warum hier normale Klammer () ?
-    return itemsList.map((item) => (
-      <li>
+  //_____________________
+
+  function packingListOnScreen(listWithAll, listWithOpenOnly) {
+    // wenn die Seite im Zustand openOnly ist, zeigt sie nur fehlende Gegenstände an
+    if (openOnly === true) {
+      return listWithOpenOnly.map((item, index) => (
+        <li key={index}>
+          <label>
+            <input
+              type="checkbox"
+              checked={item.isPacked}
+              onChange={(event) => changePackedStatusOfItem(item)}
+            />
+            {item.name}
+          </label>
+        </li>
+      ));
+    }
+
+    // nicht im Zustand openOnly? dann werden alle Gegenstände angezeigt
+    return listWithAll.map((item, index) => (
+      // warum hier normale Klammer () ?
+      <li key={index}>
         <label>
           <input
             type="checkbox"
@@ -55,20 +105,49 @@ export default function App() {
     ));
   }
 
+  //_____________________
+
   function changePackedStatusOfItem(itemWithNewPackedStatus) {
-    // warum hier geschweifte Klammer {} ?
-    const packingListWithNewPackedStatus = packingListItems.map((item) => {
+    // 1. Schritt: Ändern von packingList
+    const packingListWithNewPackedStatus = packingList.map((item) => {
+      // warum hier geschweifte Klammer {} ?
       if (item.name === itemWithNewPackedStatus.name) {
         item.isPacked = !item.isPacked;
       }
       return item;
+      // was passiert hier? Abgleich des geänderten Items mit der Liste
+      // >>> bei Übereinstimmung wird Packstatus geändert
+      // >>> alle Items werden zurück in die Liste gegeben
     });
-    updatePackingListItems(packingListWithNewPackedStatus);
+    updatePackingList(packingListWithNewPackedStatus);
+
+    // 2. Schritt: Ändern von packingListOpen >>> Filtern von der aktualisierten packingList nach fehlenden Gegenständen (openItems)
+    const openItems = packingList.filter((item) => item.isPacked === false);
+    // console.log(openItems)
+    updatePackingListOpen(openItems);
+  }
+
+  //_____________________
+
+  function showOnlyOpenItems(event) {
+    changeViewToOpenOnly(true);
+    // Button ändert Status auf openOnly
+  }
+
+  //_____________________
+
+  function showAllItems(event) {
+    changeViewToOpenOnly(false);
+    // Button ändert Status NICHT auf openOnly, also zurück auf alle Items
   }
 }
+
+/*
+  _____________________
+  STYLED COMPONENTS
+  _____________________
+  */
 
 const Headline = styled.h1`
   xcolor: hotpink;
 `;
-
-//    liste auf bildschirm malen
