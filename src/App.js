@@ -3,13 +3,15 @@ import styled from 'styled-components/macro';
 export default function App() {
   return (
     <main>
-      <Headline>Hello World</Headline>
+      <Headline>Meine Packliste</Headline>
+      <form onSubmit="">
+        <input type="text" name="inputFieldForNewItem" />
+        <button>zur Liste hinzufügen</button>
+      </form>
     </main>
   );
 }
 
-//export default App;
-
 const Headline = styled.h1`
-  color: hotpink;
+  xcolor: hotpink;
 `;
