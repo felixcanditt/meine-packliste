@@ -85,6 +85,7 @@ export default function App() {
             />
             {item.name}
           </label>
+          <button>löschen</button>
         </li>
       ));
     }
@@ -101,6 +102,13 @@ export default function App() {
           />
           {item.name}
         </label>
+        <button
+          onClick={(event) => {
+            deleteItem(event, item);
+          }}
+        >
+          löschen
+        </button>
       </li>
     ));
   }
@@ -139,6 +147,26 @@ export default function App() {
   function showAllItems(event) {
     changeViewToOpenOnly(false);
     // Button ändert Status NICHT auf openOnly, also zurück auf alle Items
+  }
+
+  //_____________________
+
+  function deleteItem(event, itemToBeDeleted) {
+    const indexDeleteMe = packingList.findIndex(
+      (item) => item.name === itemToBeDeleted.name
+    );
+    const packingListWithoutDeletedItem = packingList.slice();
+    packingListWithoutDeletedItem.splice(indexDeleteMe, 1);
+
+    updatePackingList(packingListWithoutDeletedItem);
+    const openItems = packingListWithoutDeletedItem.filter(
+      (item) => item.isPacked === false
+    );
+    updatePackingListOpen(openItems);
+
+    // Alternative: packingList.splice(indexDeleteMe, 1)
+    // >>> dadurch evtl direkte Veränderung von packingList, mir zu heikel
+    // >>> dann wäre es "openItems = packingList.filter..."
   }
 }
 
