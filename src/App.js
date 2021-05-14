@@ -8,7 +8,7 @@ export default function App() {
   _____________________
   */
 
-  const [packingList, updatePackingList] = useState([]);
+  const [packingList, updatePackingList] = useState([]); // öfter: setPackingList
   const [packingListOpen, updatePackingListOpen] = useState([]);
   // 1. Variable, 2. Methode zum Aktualisieren der Variable
   // leeres Array am Anfang
@@ -43,8 +43,8 @@ export default function App() {
       <button onClick={showOnlyOpenItems}>
         nur fehlende Gegenstände anzeigen
       </button>
-      <ul>{packingListOnScreen(packingList, packingListOpen)}</ul>
-      {/*  <ul>{onlyOpenItemsOnScreen(packingListOpen)}</ul> */}
+      <ul>{packingListOnScreen(openOnly ? packingListOpen : packingList)}</ul>
+      {/* Abfrage: bist du openOnly? wenn ja, dann übergebe packingListOpen, sonst packingList */}
     </main>
   );
 
@@ -72,27 +72,8 @@ export default function App() {
 
   //_____________________
 
-  function packingListOnScreen(listWithAll, listWithOpenOnly) {
-    // wenn die Seite im Zustand openOnly ist, zeigt sie nur fehlende Gegenstände an
-    if (openOnly === true) {
-      return listWithOpenOnly.map((item, index) => (
-        <li key={index}>
-          <label>
-            <input
-              type="checkbox"
-              checked={item.isPacked}
-              onChange={(event) => changePackedStatusOfItem(item)}
-            />
-            {item.name}
-          </label>
-          <button>löschen</button>
-        </li>
-      ));
-    }
-
-    // nicht im Zustand openOnly? dann werden alle Gegenstände angezeigt
-    return listWithAll.map((item, index) => (
-      // warum hier normale Klammer () ?
+  function packingListOnScreen(list) {
+    return list.map((item, index) => (
       <li key={index}>
         <label>
           <input
@@ -159,6 +140,7 @@ export default function App() {
     packingListWithoutDeletedItem.splice(indexDeleteMe, 1);
 
     updatePackingList(packingListWithoutDeletedItem);
+
     const openItems = packingListWithoutDeletedItem.filter(
       (item) => item.isPacked === false
     );
